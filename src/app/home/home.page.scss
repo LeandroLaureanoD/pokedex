@@ -71,3 +71,16 @@ ion-searchbar {
 .erro {
   font-weight: 600;
 }
+
+/* Carregar Pokemon */
+
+.carregar-mais {
+  max-width: 240px;
+  margin: 24px auto 10px;
+
+  --border-radius: 18px;
+  --box-shadow: none;
+
+  font-size: 14px;
+  text-transform: none;
+}

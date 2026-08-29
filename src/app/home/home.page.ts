@@ -25,6 +25,8 @@ import { PokemonListItem } from '../features/pokemon/models/pokemon-list-respons
 import { NgClass } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { heart, heartOutline } from 'ionicons/icons';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -86,26 +88,28 @@ export class HomePage implements OnInit {
   }
 
   listarPokemons(carregarMais: boolean = false): void {
+
     if (!carregarMais) {
       this.carregando = true;
     }
+
     const offsetConsulta = carregarMais
       ? this.offset + this.limit
       : 0;
 
     this.pokemonService
       .listarPokemons(this.limit, offsetConsulta)
+      .pipe(
+        switchMap(response =>
+          forkJoin(
+            response.results.map(pokemon =>
+              this.prepararPokemonCompleto(pokemon)
+            )
+          )
+        )
+      )
       .subscribe({
-        next: response => {
-          this.carregando = false;
-          this.erroCarregamento = false;
-          const novosPokemons = response.results.map(pokemon =>
-            this.prepararPokemon(pokemon)
-          );
-
-          novosPokemons.forEach(pokemon =>
-            this.carregarTiposPokemon(pokemon)
-          );
+        next: novosPokemons => {
 
           if (carregarMais) {
             this.pokemons = [
@@ -120,12 +124,17 @@ export class HomePage implements OnInit {
           }
 
           this.pokemonsFiltrados = this.pokemons;
+
+          this.carregando = false;
           this.carregandoMais = false;
+          this.erroCarregamento = false;
         },
+
         error: error => {
           console.error('Erro ao listar Pokémon', error);
-          this.carregandoMais = false;
+
           this.carregando = false;
+          this.carregandoMais = false;
           this.erroCarregamento = true;
         }
       });
@@ -169,11 +178,16 @@ export class HomePage implements OnInit {
   }
 
   selecionarPokemon(pokemon: PokemonListItem): void {
-    this.pokemonsFiltrados = [
-      this.prepararPokemon(pokemon)
-    ];
 
-    this.sugestoes = [];
+    this.prepararPokemonCompleto(pokemon)
+      .subscribe(pokemonCompleto => {
+
+        this.pokemonsFiltrados = [
+          pokemonCompleto
+        ];
+
+        this.sugestoes = [];
+      });
   }
 
   carregarPokemonsParaBusca(): void {
@@ -204,18 +218,6 @@ export class HomePage implements OnInit {
     this.listarPokemons(true);
   }
 
-  carregarTiposPokemon(pokemon: PokemonListItem): void {
-    if (!pokemon.id) {
-      return;
-    }
-
-    this.pokemonService.buscarPokemonPorId(pokemon.id).subscribe({
-      next: detalhe => {
-        pokemon.types = detalhe.types.map(tipo => tipo.type.name);
-      }
-    });
-  }
-
   obterClasseTipo(pokemon: PokemonListItem): string {
     const tipoPrincipal = pokemon.types?.[0];
 
@@ -241,5 +243,24 @@ export class HomePage implements OnInit {
     }
 
     pokemon.favorito = !pokemon.favorito;
+  }
+
+  private prepararPokemonCompleto(pokemon: PokemonListItem): Observable<PokemonListItem> {
+
+    const pokemonPreparado = this.prepararPokemon(pokemon);
+
+    if (!pokemonPreparado.id) {
+      return of(pokemonPreparado);
+    }
+
+    return this.pokemonService
+      .buscarPokemonPorId(pokemonPreparado.id)
+      .pipe(
+        map(detalhe => ({
+          ...pokemonPreparado,
+          types: detalhe.types.map(tipo => tipo.type.name)
+        })),
+        catchError(() => of(pokemonPreparado))
+      );
   }
 }
