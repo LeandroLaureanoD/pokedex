@@ -2,16 +2,15 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   IonBackButton,
+  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonImg,
+  IonLabel,
   IonSegment,
   IonSegmentButton,
-  IonLabel,
-  IonButton
+  IonTitle,
+  IonToolbar
 } from '@ionic/angular/standalone';
 
 
@@ -29,7 +28,6 @@ import { PokemonDetail } from '../../models/pokemon-detail.model';
     IonBackButton,
     IonTitle,
     IonContent,
-    IonImg,
     IonSegment,
     IonSegmentButton,
     IonLabel,

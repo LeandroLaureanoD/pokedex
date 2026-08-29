@@ -4,52 +4,67 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-searchbar placeholder="Buscar Pokémon" (ionInput)="buscarPokemon($event)">
-</ion-searchbar>
-
-@if (sugestoes.length > 0) {
-
-<ion-list>
-  @for (pokemon of sugestoes; track pokemon.name) {
-
-  <ion-item button (click)="selecionarPokemon(pokemon)">
-
-    <ion-label>
-      {{ pokemon.name }}
-    </ion-label>
-
-  </ion-item>
-
-  }
-</ion-list>
-
-}
-@if (buscandoPokemon) {
-<p>Buscando Pokémon...</p>
-}
-
-@if (buscaSemResultado) {
-<p>Nenhum Pokémon encontrado.</p>
-}
 <ion-content class="ion-padding">
+
+  <ion-searchbar placeholder="Buscar Pokémon" (ionInput)="buscarPokemon($event)">
+  </ion-searchbar>
+
+  @if (sugestoes.length > 0) {
+
+  <ion-list>
+    @for (pokemon of sugestoes; track pokemon.name) {
+
+    <ion-item button (click)="selecionarPokemon(pokemon)">
+
+      <ion-label>
+        {{ pokemon.name }}
+      </ion-label>
+
+    </ion-item>
+
+    }
+  </ion-list>
+  }
+
+  @if (buscaSemResultado) {
+  <p>Nenhum Pokémon encontrado.</p>
+  }
+
   <ion-grid>
     <ion-row>
+
       @for (pokemon of pokemonsFiltrados; track pokemon.name) {
+
       <ion-col size="6" size-md="4" size-lg="3">
+
         <ion-card (click)="abrirDetalhes(pokemon.id)">
+
           <ion-img [src]="pokemon.imageUrl" [alt]="pokemon.name">
           </ion-img>
+
           <ion-card-header>
             <ion-card-title>
               {{ pokemon.name }}
             </ion-card-title>
           </ion-card-header>
+
         </ion-card>
+
       </ion-col>
+
       }
+
     </ion-row>
   </ion-grid>
+
+  @if (!termoBusca) {
+
   <ion-button expand="block" (click)="carregarMaisPokemons()" [disabled]="carregandoMais">
+
     {{ carregandoMais ? 'Carregando...' : 'Carregar mais' }}
+
   </ion-button>
+
+  }
+
 </ion-content>

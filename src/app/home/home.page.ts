@@ -1,27 +1,26 @@
 import { Component, inject, OnInit } from '@angular/core';
 import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
+  IonButton,
   IonCard,
-  IonCardContent,
   IonCardHeader,
   IonCardTitle,
-  IonImg,
-  IonGrid,
-  IonRow,
   IonCol,
-  IonSearchbar,
-  IonButton,
-  IonList,
+  IonContent,
+  IonGrid,
+  IonHeader,
+  IonImg,
   IonItem,
-  IonLabel
+  IonLabel,
+  IonList,
+  IonRow,
+  IonSearchbar,
+  IonTitle,
+  IonToolbar
 } from '@ionic/angular/standalone';
 
+import { Router } from '@angular/router';
 import { PokemonService } from '../core/services/pokemon.service';
 import { PokemonListItem } from '../features/pokemon/models/pokemon-list-response.model';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -33,7 +32,6 @@ import { Router } from '@angular/router';
     IonTitle,
     IonContent,
     IonCard,
-    IonCardContent,
     IonCardHeader,
     IonCardTitle,
     IonImg,
@@ -61,7 +59,11 @@ export class HomePage implements OnInit {
 
   carregandoMais = false;
   buscaSemResultado = false;
-  buscandoPokemon = false;
+
+  carregando = true;
+  erroCarregamento = false;
+
+  termoBusca = '';
 
   private readonly router = inject(Router);
 
@@ -72,30 +74,32 @@ export class HomePage implements OnInit {
 
   listarPokemons(carregarMais: boolean = false): void {
     if (!carregarMais) {
-      this.offset = 0;
+      this.carregando = true;
     }
+    const offsetConsulta = carregarMais
+      ? this.offset + this.limit
+      : 0;
 
     this.pokemonService
-      .listarPokemons(this.limit, this.offset)
+      .listarPokemons(this.limit, offsetConsulta)
       .subscribe({
         next: response => {
-          const novosPokemons = response.results.map(pokemon => {
-            const id = this.extrairIdPokemon(pokemon.url);
-
-            return {
-              ...pokemon,
-              id,
-              imageUrl: this.pokemonService.obterImagemPokemon(id)
-            };
-          });
+          this.carregando = false;
+          this.erroCarregamento = false;
+          const novosPokemons = response.results.map(pokemon =>
+            this.prepararPokemon(pokemon)
+          );
 
           if (carregarMais) {
             this.pokemons = [
               ...this.pokemons,
               ...novosPokemons
             ];
+
+            this.offset = offsetConsulta;
           } else {
             this.pokemons = novosPokemons;
+            this.offset = 0;
           }
 
           this.pokemonsFiltrados = this.pokemons;
@@ -104,8 +108,20 @@ export class HomePage implements OnInit {
         error: error => {
           console.error('Erro ao listar Pokémon', error);
           this.carregandoMais = false;
+          this.carregando = false;
+          this.erroCarregamento = true;
         }
       });
+  }
+
+  private prepararPokemon(pokemon: PokemonListItem): PokemonListItem {
+    const id = this.extrairIdPokemon(pokemon.url);
+
+    return {
+      ...pokemon,
+      id,
+      imageUrl: this.pokemonService.obterImagemPokemon(id)
+    };
   }
 
   private extrairIdPokemon(url: string): number {
@@ -115,6 +131,9 @@ export class HomePage implements OnInit {
 
   buscarPokemon(event: CustomEvent): void {
     const valor = event.detail.value?.toLowerCase().trim() ?? '';
+
+    this.termoBusca = valor;
+    this.buscaSemResultado = false;
 
     if (!valor) {
       this.sugestoes = [];
@@ -127,17 +146,13 @@ export class HomePage implements OnInit {
         pokemon.name.toLowerCase().startsWith(valor)
       )
       .slice(0, 8);
+
+    this.buscaSemResultado = this.sugestoes.length === 0;
   }
 
   selecionarPokemon(pokemon: PokemonListItem): void {
-    const id = this.extrairIdPokemon(pokemon.url);
-
     this.pokemonsFiltrados = [
-      {
-        ...pokemon,
-        id,
-        imageUrl: this.pokemonService.obterImagemPokemon(id)
-      }
+      this.prepararPokemon(pokemon)
     ];
 
     this.sugestoes = [];
@@ -167,7 +182,6 @@ export class HomePage implements OnInit {
     }
 
     this.carregandoMais = true;
-    this.offset += this.limit;
 
     this.listarPokemons(true);
   }
