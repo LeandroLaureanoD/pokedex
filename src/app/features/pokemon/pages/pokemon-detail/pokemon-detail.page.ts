@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   IonBackButton,
-  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
@@ -12,7 +11,6 @@ import {
   IonTitle,
   IonToolbar
 } from '@ionic/angular/standalone';
-
 
 import { PokemonService } from '../../../../core/services/pokemon.service';
 import { PokemonDetail } from '../../models/pokemon-detail.model';
@@ -31,7 +29,6 @@ import { PokemonDetail } from '../../models/pokemon-detail.model';
     IonSegment,
     IonSegmentButton,
     IonLabel,
-    IonButton
   ]
 })
 export class PokemonDetailPage implements OnInit {
@@ -42,12 +39,13 @@ export class PokemonDetailPage implements OnInit {
   pokemon?: PokemonDetail;
 
   imgPokemon = '';
+  gifPokemon = '';
   abaSelecionada = 'sobre';
 
   carregandoImagem = true;
-  favorito = false;
 
-
+  constructor() {
+  }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -61,31 +59,50 @@ export class PokemonDetailPage implements OnInit {
     this.pokemonService.buscarPokemonPorId(id).subscribe({
       next: response => {
         this.pokemon = response;
-        this.carregandoImagem = true;
-        this.imgPokemon = this.pokemonService.obterImagemPokemon(response.id);
-        this.favorito = this.pokemonService.pokemonFavorito(response.id);
+
+        this.imgPokemon =
+          this.pokemonService.obterImagemPokemon(response.id);
+
+        this.gifPokemon =
+          this.pokemonService.obterGifPokemon(response.name);
       },
       error: error => {
         console.error('Erro ao buscar Pokémon', error);
       }
     });
   }
-
   alterarAba(event: CustomEvent): void {
     this.abaSelecionada = event.detail.value ?? 'sobre';
   }
 
-  alternarFavorito(): void {
-    if (!this.pokemon) {
-      return;
-    }
+  formatarId(id: number): string {
+    return `#${String(id).padStart(3, '0')}`;
+  }
 
-    if (this.favorito) {
-      this.pokemonService.removerFavorito(this.pokemon.id);
-    } else {
-      this.pokemonService.favoritarPokemon(this.pokemon.id);
-    }
+  formatarAltura(height: number): string {
+    return `${height / 10} m`;
+  }
 
-    this.favorito = !this.favorito;
+  formatarPeso(weight: number): string {
+    return `${weight / 10} kg`;
+  }
+
+  formatarNomeStatus(nome: string): string {
+    const nomes: Record<string, string> = {
+      hp: 'HP',
+      attack: 'Ataque',
+      defense: 'Defesa',
+      'special-attack': 'Ataque Especial',
+      'special-defense': 'Defesa Especial',
+      speed: 'Velocidade'
+    };
+
+    return nomes[nome] ?? nome;
+  }
+
+  obterClasseTipoPrincipal(): string {
+    const tipo = this.pokemon?.types?.[0]?.type.name;
+
+    return tipo ? `detalhe-${tipo}` : 'detalhe-default';
   }
 }

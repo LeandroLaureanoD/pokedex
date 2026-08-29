@@ -15,12 +15,16 @@ import {
   IonRow,
   IonSearchbar,
   IonTitle,
-  IonToolbar
+  IonToolbar,
+  IonIcon
 } from '@ionic/angular/standalone';
 
 import { Router } from '@angular/router';
 import { PokemonService } from '../core/services/pokemon.service';
 import { PokemonListItem } from '../features/pokemon/models/pokemon-list-response.model';
+import { NgClass } from '@angular/common';
+import { addIcons } from 'ionicons';
+import { heart, heartOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-home',
@@ -42,7 +46,9 @@ import { PokemonListItem } from '../features/pokemon/models/pokemon-list-respons
     IonButton,
     IonList,
     IonItem,
-    IonLabel
+    IonLabel,
+    NgClass,
+    IonIcon
   ],
 })
 export class HomePage implements OnInit {
@@ -67,6 +73,13 @@ export class HomePage implements OnInit {
 
   private readonly router = inject(Router);
 
+  constructor() {
+    addIcons({
+      heart,
+      heartOutline
+    });
+  }
+
   ngOnInit(): void {
     this.listarPokemons();
     this.carregarPokemonsParaBusca();
@@ -88,6 +101,10 @@ export class HomePage implements OnInit {
           this.erroCarregamento = false;
           const novosPokemons = response.results.map(pokemon =>
             this.prepararPokemon(pokemon)
+          );
+
+          novosPokemons.forEach(pokemon =>
+            this.carregarTiposPokemon(pokemon)
           );
 
           if (carregarMais) {
@@ -120,7 +137,8 @@ export class HomePage implements OnInit {
     return {
       ...pokemon,
       id,
-      imageUrl: this.pokemonService.obterImagemPokemon(id)
+      imageUrl: this.pokemonService.obterImagemPokemon(id),
+      favorito: this.pokemonService.pokemonFavorito(id)
     };
   }
 
@@ -184,5 +202,44 @@ export class HomePage implements OnInit {
     this.carregandoMais = true;
 
     this.listarPokemons(true);
+  }
+
+  carregarTiposPokemon(pokemon: PokemonListItem): void {
+    if (!pokemon.id) {
+      return;
+    }
+
+    this.pokemonService.buscarPokemonPorId(pokemon.id).subscribe({
+      next: detalhe => {
+        pokemon.types = detalhe.types.map(tipo => tipo.type.name);
+      }
+    });
+  }
+
+  obterClasseTipo(pokemon: PokemonListItem): string {
+    const tipoPrincipal = pokemon.types?.[0];
+
+    return tipoPrincipal
+      ? `tipo-${tipoPrincipal}`
+      : 'tipo-default';
+  }
+
+  alternarFavoritoCard(
+    event: Event,
+    pokemon: PokemonListItem
+  ): void {
+    event.stopPropagation();
+
+    if (!pokemon.id) {
+      return;
+    }
+
+    if (pokemon.favorito) {
+      this.pokemonService.removerFavorito(pokemon.id);
+    } else {
+      this.pokemonService.favoritarPokemon(pokemon.id);
+    }
+
+    pokemon.favorito = !pokemon.favorito;
   }
 }

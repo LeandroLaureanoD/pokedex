@@ -3,6 +3,9 @@ export interface PokemonListItem {
     name: string;
     url: string;
     imageUrl?: string;
+    gifUrl?: string;
+    types?: string[];
+    favorito?: boolean;
 }
 
 export interface PokemonListResponse {

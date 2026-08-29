@@ -1,0 +1,210 @@
+:root {
+  --pokemon-grass: #78c88f;
+  --pokemon-grass-light: #dff3e3;
+
+  --pokemon-fire: #f47c2c;
+  --pokemon-fire-light: #fbe3dd;
+
+  --pokemon-water: #67a9e8;
+  --pokemon-water-light: #dceefb;
+
+  --pokemon-electric: #e3c842;
+  --pokemon-electric-light: #fff3c4;
+
+  --pokemon-poison: #a96ac3;
+  --pokemon-poison-light: #eadff3;
+
+  --pokemon-bug: #9eb83f;
+  --pokemon-bug-light: #e7f0d6;
+
+  --pokemon-normal: #aaa99e;
+  --pokemon-normal-light: #eeeeee;
+
+  --pokemon-flying: #8fa9e6;
+  --pokemon-flying-light: #e4e8f7;
+
+  --pokemon-ground: #d4ae64;
+  --pokemon-ground-light: #eee1c5;
+
+  --pokemon-rock: #b39b4f;
+  --pokemon-rock-light: #e3ddc5;
+
+  --pokemon-psychic: #e86e9e;
+  --pokemon-psychic-light: #f7dce6;
+
+  --pokemon-ice: #78d1d0;
+  --pokemon-ice-light: #dff5f5;
+
+  --pokemon-dragon: #7462d5;
+  --pokemon-dragon-light: #ddd8f5;
+
+  --pokemon-dark: #655b57;
+  --pokemon-dark-light: #dddddd;
+
+  --pokemon-fairy: #df97c9;
+  --pokemon-fairy-light: #f7e1f2;
+
+  --pokemon-fighting: #bd5348;
+  --pokemon-fighting-light: #f3dddd;
+
+  --pokemon-ghost: #706398;
+  --pokemon-ghost-light: #e4def0;
+
+  --pokemon-steel: #a5adb9;
+  --pokemon-steel-light: #e2e5e7;
+
+  --pokemon-default: #bdbdbd;
+  --pokemon-default-light: #ffffff;
+}
+
+.tipo-grass {
+  background: var(--pokemon-grass-light);
+}
+
+.tipo-fire {
+  background: var(--pokemon-fire-light);
+}
+
+.tipo-water {
+  background: var(--pokemon-water-light);
+}
+
+.tipo-electric {
+  background: var(--pokemon-electric-light);
+}
+
+.tipo-poison {
+  background: var(--pokemon-poison-light);
+}
+
+.tipo-bug {
+  background: var(--pokemon-bug-light);
+}
+
+.tipo-normal {
+  background: var(--pokemon-normal-light);
+}
+
+.tipo-flying {
+  background: var(--pokemon-flying-light);
+}
+
+.tipo-ground {
+  background: var(--pokemon-ground-light);
+}
+
+.tipo-rock {
+  background: var(--pokemon-rock-light);
+}
+
+.tipo-psychic {
+  background: var(--pokemon-psychic-light);
+}
+
+.tipo-ice {
+  background: var(--pokemon-ice-light);
+}
+
+.tipo-dragon {
+  background: var(--pokemon-dragon-light);
+}
+
+.tipo-dark {
+  background: var(--pokemon-dark-light);
+}
+
+.tipo-fairy {
+  background: var(--pokemon-fairy-light);
+}
+
+.tipo-fighting {
+  background: var(--pokemon-fighting-light);
+}
+
+.tipo-ghost {
+  background: var(--pokemon-ghost-light);
+}
+
+.tipo-steel {
+  background: var(--pokemon-steel-light);
+}
+
+.tipo-default {
+  background: var(--pokemon-default-light);
+}
+
+.detalhe-grass {
+  background: var(--pokemon-grass);
+}
+
+.detalhe-fire {
+  background: var(--pokemon-fire);
+}
+
+.detalhe-water {
+  background: var(--pokemon-water);
+}
+
+.detalhe-electric {
+  background: var(--pokemon-electric);
+}
+
+.detalhe-poison {
+  background: var(--pokemon-poison);
+}
+
+.detalhe-bug {
+  background: var(--pokemon-bug);
+}
+
+.detalhe-normal {
+  background: var(--pokemon-normal);
+}
+
+.detalhe-flying {
+  background: var(--pokemon-flying);
+}
+
+.detalhe-ground {
+  background: var(--pokemon-ground);
+}
+
+.detalhe-rock {
+  background: var(--pokemon-rock);
+}
+
+.detalhe-psychic {
+  background: var(--pokemon-psychic);
+}
+
+.detalhe-ice {
+  background: var(--pokemon-ice);
+}
+
+.detalhe-dragon {
+  background: var(--pokemon-dragon);
+}
+
+.detalhe-dark {
+  background: var(--pokemon-dark);
+}
+
+.detalhe-fairy {
+  background: var(--pokemon-fairy);
+}
+
+.detalhe-fighting {
+  background: var(--pokemon-fighting);
+}
+
+.detalhe-ghost {
+  background: var(--pokemon-ghost);
+}
+
+.detalhe-steel {
+  background: var(--pokemon-steel);
+}
+
+.detalhe-default {
+  background: var(--pokemon-default);
+}

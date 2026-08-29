@@ -8,81 +8,172 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-button fill="clear" (click)="alternarFavorito()">
+<ion-content>
 
-    {{ favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}
-
-  </ion-button>
   @if (pokemon) {
 
-  <div class="pokemon-image">
+  <div class="pokemon-hero" [class]="
+        'pokemon-hero ' + obterClasseTipoPrincipal()
+      ">
 
-    @if (carregandoImagem) {
-    <div class="image-placeholder"></div>
-    }
+    <div class="pokemon-hero-header">
 
-    <img [src]="imgPokemon" [alt]="pokemon.name" [class.carregada]="!carregandoImagem"
-      (load)="carregandoImagem = false">
+      <div>
+        <h1>{{ pokemon.name }}</h1>
+
+        <div class="hero-tipos">
+          @for (tipo of pokemon.types; track tipo.type.name) {
+          <span class="hero-tipo">
+            {{ tipo.type.name }}
+          </span>
+          }
+        </div>
+      </div>
+
+      <span class="pokemon-id">
+        {{ formatarId(pokemon.id) }}
+      </span>
+
+    </div>
+
+    <div class="pokemon-image-container">
+
+      @if (carregandoImagem) {
+      <div class="image-placeholder"></div>
+      }
+
+      <img class="pokemon-artwork" [src]="imgPokemon" [alt]="pokemon.name" [class.carregada]="!carregandoImagem"
+        (load)="carregandoImagem = false">
+
+    </div>
 
   </div>
 
-  <h1>{{ pokemon.name }}</h1>
+  <div class="pokemon-detalhes">
 
-  <ion-segment [value]="abaSelecionada" (ionChange)="alterarAba($event)">
+    <ion-segment [value]="abaSelecionada" (ionChange)="alterarAba($event)">
 
-    <ion-segment-button value="sobre">
-      <ion-label>Sobre</ion-label>
-    </ion-segment-button>
+      <ion-segment-button value="sobre">
+        <ion-label>Sobre</ion-label>
+      </ion-segment-button>
 
-    <ion-segment-button value="status">
-      <ion-label>Status</ion-label>
-    </ion-segment-button>
+      <ion-segment-button value="status">
+        <ion-label>Status</ion-label>
+      </ion-segment-button>
 
-    <ion-segment-button value="habilidades">
-      <ion-label>Habilidades</ion-label>
-    </ion-segment-button>
+      <ion-segment-button value="habilidades">
+        <ion-label>Habilidades</ion-label>
+      </ion-segment-button>
 
-  </ion-segment>
+    </ion-segment>
 
-  @if (abaSelecionada === 'sobre') {
+    <!-- SOBRE -->
 
-  <p>ID: {{ pokemon.id }}</p>
+    @if (abaSelecionada === 'sobre') {
 
-  <p>Altura: {{ pokemon.height }}</p>
+    <div class="informacoes">
 
-  <p>Peso: {{ pokemon.weight }}</p>
+      <div class="informacao">
+        <span>Altura</span>
 
-  <h2>Tipos</h2>
+        <strong>
+          {{ formatarAltura(pokemon.height) }}
+        </strong>
+      </div>
 
-  @for (tipo of pokemon.types; track tipo.type.name) {
-  <p>{{ tipo.type.name }}</p>
-  }
+      <div class="informacao">
+        <span>Peso</span>
 
-  }
+        <strong>
+          {{ formatarPeso(pokemon.weight) }}
+        </strong>
+      </div>
 
-  @if (abaSelecionada === 'status') {
+    </div>
 
-  <h2>Status</h2>
 
-  @for (status of pokemon.stats; track status.stat.name) {
-  <p>
-    {{ status.stat.name }}:
-    {{ status.base_stat }}
-  </p>
-  }
 
-  }
+    }
 
-  @if (abaSelecionada === 'habilidades') {
+    <!-- STATUS -->
 
-  <h2>Habilidades</h2>
+    @if (abaSelecionada === 'status') {
 
-  @for (habilidade of pokemon.abilities; track habilidade.ability.name) {
-  <p>{{ habilidade.ability.name }}</p>
-  }
+    <div class="status-lista">
 
-  }
+      @for (status of pokemon.stats; track status.stat.name) {
+
+      <div class="status-item">
+
+        <div class="status-info">
+
+          <span>
+            {{ formatarNomeStatus(status.stat.name) }}
+          </span>
+
+          <strong>
+            {{ status.base_stat }}
+          </strong>
+
+        </div>
+
+        <div class="status-barra">
+
+          <div class="status-valor" [style.width.%]="
+                    status.base_stat > 100
+                      ? 100
+                      : status.base_stat
+                  ">
+          </div>
+
+        </div>
+
+      </div>
+
+      }
+
+    </div>
+
+    }
+
+    <!-- HABILIDADES -->
+
+    @if (abaSelecionada === 'habilidades') {
+
+    <div class="habilidades-container">
+
+      <div class="habilidades-lista">
+
+        @for (
+        habilidade of pokemon.abilities;
+        track habilidade.ability.name
+        ) {
+
+        <div class="habilidade-card">
+
+          <strong>
+            {{ habilidade.ability.name }}
+          </strong>
+
+          <span>
+            {{ habilidade.is_hidden ? 'Habilidade oculta' : 'Habilidade principal' }}
+          </span>
+
+        </div>
+
+        }
+
+      </div>
+
+      <div class="habilidades-gif">
+        <img [src]="gifPokemon" [alt]="pokemon.name">
+      </div>
+
+    </div>
+
+    }
+
+  </div>
 
   }
 

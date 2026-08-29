@@ -15,6 +15,7 @@ export class PokemonService {
   private readonly apiUrl = environment.apiUrl;
   private readonly imageUrl = environment.pokemonImageUrl;
   private readonly chaveFavoritos = 'pokemonsFavoritos';
+  private readonly gifUrl = environment.pokemonGifUrl;
 
 
   listarPokemons(limit: number = 20, offset: number = 0): Observable<PokemonListResponse> {
@@ -76,5 +77,9 @@ export class PokemonService {
 
   pokemonFavorito(id: number): boolean {
     return this.listarFavoritos().includes(id);
+  }
+
+  obterGifPokemon(nome: string): string {
+    return `${this.gifUrl}/${nome.toLowerCase()}.gif`;
   }
 }
