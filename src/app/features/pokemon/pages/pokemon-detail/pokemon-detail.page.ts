@@ -10,7 +10,8 @@ import {
   IonImg,
   IonSegment,
   IonSegmentButton,
-  IonLabel
+  IonLabel,
+  IonButton
 } from '@ionic/angular/standalone';
 
 
@@ -31,7 +32,8 @@ import { PokemonDetail } from '../../models/pokemon-detail.model';
     IonImg,
     IonSegment,
     IonSegmentButton,
-    IonLabel
+    IonLabel,
+    IonButton
   ]
 })
 export class PokemonDetailPage implements OnInit {
@@ -40,11 +42,14 @@ export class PokemonDetailPage implements OnInit {
   private readonly pokemonService = inject(PokemonService);
 
   pokemon?: PokemonDetail;
+
   imgPokemon = '';
+  abaSelecionada = 'sobre';
 
   carregandoImagem = true;
+  favorito = false;
 
-  abaSelecionada = 'sobre';
+
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -60,6 +65,7 @@ export class PokemonDetailPage implements OnInit {
         this.pokemon = response;
         this.carregandoImagem = true;
         this.imgPokemon = this.pokemonService.obterImagemPokemon(response.id);
+        this.favorito = this.pokemonService.pokemonFavorito(response.id);
       },
       error: error => {
         console.error('Erro ao buscar Pokémon', error);
@@ -68,6 +74,20 @@ export class PokemonDetailPage implements OnInit {
   }
 
   alterarAba(event: CustomEvent): void {
-   this.abaSelecionada = event.detail.value ?? 'sobre';
+    this.abaSelecionada = event.detail.value ?? 'sobre';
+  }
+
+  alternarFavorito(): void {
+    if (!this.pokemon) {
+      return;
+    }
+
+    if (this.favorito) {
+      this.pokemonService.removerFavorito(this.pokemon.id);
+    } else {
+      this.pokemonService.favoritarPokemon(this.pokemon.id);
+    }
+
+    this.favorito = !this.favorito;
   }
 }

@@ -14,6 +14,7 @@ export class PokemonService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
   private readonly imageUrl = environment.pokemonImageUrl;
+  private readonly chaveFavoritos = 'pokemonsFavoritos';
 
 
   listarPokemons(limit: number = 20, offset: number = 0): Observable<PokemonListResponse> {
@@ -30,5 +31,34 @@ export class PokemonService {
     return this.http.get<PokemonDetail>(
       `${this.apiUrl}/pokemon/${id}`
     );
+  }
+
+  listarFavoritos(): number[] {
+    const favoritos = localStorage.getItem(this.chaveFavoritos);
+
+    return favoritos ? JSON.parse(favoritos) : [];
+  }
+
+  favoritarPokemon(id: number): void {
+    const favoritos = this.listarFavoritos();
+
+    if (!favoritos.includes(id)) {
+      favoritos.push(id);
+      localStorage.setItem(this.chaveFavoritos, JSON.stringify(favoritos));
+    }
+  }
+
+  removerFavorito(id: number): void {
+    const favoritos = this.listarFavoritos()
+      .filter(pokemonId => pokemonId !== id);
+
+    localStorage.setItem(
+      this.chaveFavoritos,
+      JSON.stringify(favoritos)
+    );
+  }
+
+  pokemonFavorito(id: number): boolean {
+    return this.listarFavoritos().includes(id);
   }
 }

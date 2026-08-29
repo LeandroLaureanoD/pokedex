@@ -9,81 +9,80 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <ion-button fill="clear" (click)="alternarFavorito()">
 
+    {{ favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}
+
+  </ion-button>
   @if (pokemon) {
 
-    <div class="pokemon-image">
+  <div class="pokemon-image">
 
-      @if (carregandoImagem) {
-        <div class="image-placeholder"></div>
-      }
-
-      <img
-        [src]="imgPokemon"
-        [alt]="pokemon.name"
-        [class.carregada]="!carregandoImagem"
-        (load)="carregandoImagem = false">
-
-    </div>
-
-    <h1>{{ pokemon.name }}</h1>
-
-    <ion-segment
-      [value]="abaSelecionada"
-      (ionChange)="alterarAba($event)">
-
-      <ion-segment-button value="sobre">
-        <ion-label>Sobre</ion-label>
-      </ion-segment-button>
-
-      <ion-segment-button value="status">
-        <ion-label>Status</ion-label>
-      </ion-segment-button>
-
-      <ion-segment-button value="habilidades">
-        <ion-label>Habilidades</ion-label>
-      </ion-segment-button>
-
-    </ion-segment>
-
-    @if (abaSelecionada === 'sobre') {
-
-      <p>ID: {{ pokemon.id }}</p>
-
-      <p>Altura: {{ pokemon.height }}</p>
-
-      <p>Peso: {{ pokemon.weight }}</p>
-
-      <h2>Tipos</h2>
-
-      @for (tipo of pokemon.types; track tipo.type.name) {
-        <p>{{ tipo.type.name }}</p>
-      }
-
+    @if (carregandoImagem) {
+    <div class="image-placeholder"></div>
     }
 
-    @if (abaSelecionada === 'status') {
+    <img [src]="imgPokemon" [alt]="pokemon.name" [class.carregada]="!carregandoImagem"
+      (load)="carregandoImagem = false">
 
-      <h2>Status</h2>
+  </div>
 
-      @for (status of pokemon.stats; track status.stat.name) {
-        <p>
-          {{ status.stat.name }}:
-          {{ status.base_stat }}
-        </p>
-      }
+  <h1>{{ pokemon.name }}</h1>
 
-    }
+  <ion-segment [value]="abaSelecionada" (ionChange)="alterarAba($event)">
 
-    @if (abaSelecionada === 'habilidades') {
+    <ion-segment-button value="sobre">
+      <ion-label>Sobre</ion-label>
+    </ion-segment-button>
 
-      <h2>Habilidades</h2>
+    <ion-segment-button value="status">
+      <ion-label>Status</ion-label>
+    </ion-segment-button>
 
-      @for (habilidade of pokemon.abilities; track habilidade.ability.name) {
-        <p>{{ habilidade.ability.name }}</p>
-      }
+    <ion-segment-button value="habilidades">
+      <ion-label>Habilidades</ion-label>
+    </ion-segment-button>
 
-    }
+  </ion-segment>
+
+  @if (abaSelecionada === 'sobre') {
+
+  <p>ID: {{ pokemon.id }}</p>
+
+  <p>Altura: {{ pokemon.height }}</p>
+
+  <p>Peso: {{ pokemon.weight }}</p>
+
+  <h2>Tipos</h2>
+
+  @for (tipo of pokemon.types; track tipo.type.name) {
+  <p>{{ tipo.type.name }}</p>
+  }
+
+  }
+
+  @if (abaSelecionada === 'status') {
+
+  <h2>Status</h2>
+
+  @for (status of pokemon.stats; track status.stat.name) {
+  <p>
+    {{ status.stat.name }}:
+    {{ status.base_stat }}
+  </p>
+  }
+
+  }
+
+  @if (abaSelecionada === 'habilidades') {
+
+  <h2>Habilidades</h2>
+
+  @for (habilidade of pokemon.abilities; track habilidade.ability.name) {
+  <p>{{ habilidade.ability.name }}</p>
+  }
+
+  }
 
   }
 
