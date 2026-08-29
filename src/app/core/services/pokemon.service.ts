@@ -11,10 +11,16 @@ export class PokemonService {
 
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
+  private readonly imageUrl = environment.pokemonImageUrl;
+
 
   listarPokemons(limit: number = 20, offset: number = 0): Observable<PokemonListResponse> {
     return this.http.get<PokemonListResponse>(
       `${this.apiUrl}/pokemon?limit=${limit}&offset=${offset}`
     );
+  }
+
+  obterImagemPokemon(id: number): string {
+    return `${this.imageUrl}/${id}.png`;
   }
 }

@@ -11,7 +11,8 @@ import {
   IonImg,
   IonGrid,
   IonRow,
-  IonCol
+  IonCol,
+  IonSearchbar
 } from '@ionic/angular/standalone';
 
 import { PokemonService } from '../core/services/pokemon.service';
@@ -33,7 +34,8 @@ import { PokemonListItem } from '../features/pokemon/models/pokemon-list-respons
     IonImg,
     IonGrid,
     IonRow,
-    IonCol
+    IonCol,
+    IonSearchbar
   ],
 })
 export class HomePage implements OnInit {
@@ -41,6 +43,7 @@ export class HomePage implements OnInit {
   private readonly pokemonService = inject(PokemonService);
 
   pokemons: PokemonListItem[] = [];
+  pokemonsFiltrados: PokemonListItem[] = [];
 
   ngOnInit(): void {
     this.listarPokemons();
@@ -49,10 +52,17 @@ export class HomePage implements OnInit {
   listarPokemons(): void {
     this.pokemonService.listarPokemons().subscribe({
       next: response => {
-        this.pokemons = response.results.map(pokemon => ({
-          ...pokemon,
-          id: this.extrairIdPokemon(pokemon.url)
-        }));
+        this.pokemons = response.results.map(pokemon => {
+          const id = this.extrairIdPokemon(pokemon.url);
+
+          return {
+            ...pokemon,
+            id,
+            imageUrl: this.pokemonService.obterImagemPokemon(id)
+          };
+        });
+
+        this.pokemonsFiltrados = this.pokemons;
       },
       error: error => {
         console.error('Erro ao listar Pokémon', error);
@@ -70,5 +80,18 @@ export class HomePage implements OnInit {
       return '';
     }
     return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+  }
+
+  buscarPokemon(event: CustomEvent): void {
+    const valor = event.detail.value?.toLowerCase().trim() ?? '';
+
+    if (!valor) {
+      this.pokemonsFiltrados = this.pokemons;
+      return;
+    }
+
+    this.pokemonsFiltrados = this.pokemons.filter(pokemon =>
+      pokemon.name.toLowerCase().includes(valor)
+    );
   }
 }
