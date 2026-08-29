@@ -25,4 +25,7 @@
       }
     </ion-row>
   </ion-grid>
+  <ion-button expand="block" (click)="carregarMaisPokemons()" [disabled]="carregandoMais">
+    {{ carregandoMais ? 'Carregando...' : 'Carregar mais' }}
+  </ion-button>
 </ion-content>

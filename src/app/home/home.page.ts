@@ -12,7 +12,8 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonSearchbar
+  IonSearchbar,
+  IonButton
 } from '@ionic/angular/standalone';
 
 import { PokemonService } from '../core/services/pokemon.service';
@@ -36,7 +37,8 @@ import { Router } from '@angular/router';
     IonGrid,
     IonRow,
     IonCol,
-    IonSearchbar
+    IonSearchbar,
+    IonButton
   ],
 })
 export class HomePage implements OnInit {
@@ -46,31 +48,53 @@ export class HomePage implements OnInit {
   pokemons: PokemonListItem[] = [];
   pokemonsFiltrados: PokemonListItem[] = [];
 
+  limit = 20;
+  offset = 0;
+
+  carregandoMais = false;
+
   private readonly router = inject(Router);
 
   ngOnInit(): void {
     this.listarPokemons();
   }
 
-  listarPokemons(): void {
-    this.pokemonService.listarPokemons().subscribe({
-      next: response => {
-        this.pokemons = response.results.map(pokemon => {
-          const id = this.extrairIdPokemon(pokemon.url);
+  listarPokemons(carregarMais: boolean = false): void {
+    if (!carregarMais) {
+      this.offset = 0;
+    }
 
-          return {
-            ...pokemon,
-            id,
-            imageUrl: this.pokemonService.obterImagemPokemon(id)
-          };
-        });
+    this.pokemonService
+      .listarPokemons(this.limit, this.offset)
+      .subscribe({
+        next: response => {
+          const novosPokemons = response.results.map(pokemon => {
+            const id = this.extrairIdPokemon(pokemon.url);
 
-        this.pokemonsFiltrados = this.pokemons;
-      },
-      error: error => {
-        console.error('Erro ao listar Pokémon', error);
-      }
-    });
+            return {
+              ...pokemon,
+              id,
+              imageUrl: this.pokemonService.obterImagemPokemon(id)
+            };
+          });
+
+          if (carregarMais) {
+            this.pokemons = [
+              ...this.pokemons,
+              ...novosPokemons
+            ];
+          } else {
+            this.pokemons = novosPokemons;
+          }
+
+          this.pokemonsFiltrados = this.pokemons;
+          this.carregandoMais = false;
+        },
+        error: error => {
+          console.error('Erro ao listar Pokémon', error);
+          this.carregandoMais = false;
+        }
+      });
   }
 
   private extrairIdPokemon(url: string): number {
@@ -96,5 +120,16 @@ export class HomePage implements OnInit {
       return;
     }
     this.router.navigate(['/pokemon', id]);
+  }
+
+  carregarMaisPokemons(): void {
+    if (this.carregandoMais) {
+      return;
+    }
+
+    this.carregandoMais = true;
+    this.offset += this.limit;
+
+    this.listarPokemons(true);
   }
 }
