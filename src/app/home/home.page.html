@@ -1,40 +1,105 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Pokédex</ion-title>
+  <ion-toolbar class="app-toolbar">
+
+    <div class="toolbar-grid">
+
+      <div class="toolbar-space"></div>
+
+      <span class="toolbar-title">
+        Pokédex
+      </span>
+
+      <div class="toolbar-space"></div>
+
+    </div>
+
   </ion-toolbar>
 </ion-header>
 
+
+
 <ion-content class="ion-padding">
 
-  <ion-searchbar placeholder="Buscar Pokémon" (ionInput)="buscarPokemon($event)">
+  <ion-searchbar class="pokemon-search" placeholder="Buscar Pokémon" (ionInput)="buscarPokemon($event)">
   </ion-searchbar>
 
+  <ion-segment [value]="filtroSelecionado" (ionChange)="alterarFiltro($event.detail.value)">
+
+    <ion-segment-button value="todos">
+      <ion-label>Todos</ion-label>
+    </ion-segment-button>
+
+    <ion-segment-button value="favoritos">
+      <ion-label>Favoritos</ion-label>
+    </ion-segment-button>
+
+  </ion-segment>
+
   @if (sugestoes.length > 0) {
-  <ion-list>
+  <ion-list class="lista-sugestoes">
+
     @for (pokemon of sugestoes; track pokemon.name) {
-    <ion-item button (click)="selecionarPokemon(pokemon)">
-      <ion-label>{{ pokemon.name }}</ion-label>
+
+    <ion-item class="sugestao-item" button detail="false" lines="none" (click)="selecionarPokemon(pokemon)">
+
+      <ion-label>
+        {{ pokemon.name }}
+      </ion-label>
+      <ion-icon slot="end" name="chevron-forward-outline">
+      </ion-icon>
+
+
     </ion-item>
+
     }
+
   </ion-list>
   }
 
-  @if (buscaSemResultado) {
-  <p class="mensagem">Nenhum Pokémon encontrado.</p>
-  }
-
   @if (carregando) {
-  <p class="mensagem">Carregando Pokémon...</p>
+
+  <p class="mensagem">
+    Carregando Pokémon...
+  </p>
+
   }
 
   @if (erroCarregamento) {
+
   <p class="mensagem erro">
     Não foi possível carregar os Pokémon.
   </p>
+
   }
 
-  @if (!carregando && !erroCarregamento) {
+  @if (
+  !carregando &&
+  !erroCarregamento &&
+  pokemonsFiltrados.length === 0
+  ) {
+
+  <div class="mensagem-vazia">
+
+    <div class="mensagem-vazia-icone">
+      🔎
+    </div>
+
+    <p>
+      Nenhum Pokémon encontrado.
+    </p>
+
+  </div>
+
+  }
+
+  @if (
+  !carregando &&
+  !erroCarregamento &&
+  pokemonsFiltrados.length > 0
+  ) {
+
   <ion-grid>
+
     <ion-row>
 
       @for (pokemon of pokemonsFiltrados; track pokemon.name) {
@@ -42,13 +107,21 @@
       <ion-col size="6" size-md="4" size-lg="3">
 
         <ion-card class="pokemon-card" [ngClass]="obterClasseTipo(pokemon)" (click)="abrirDetalhes(pokemon.id)">
-          <ion-button fill="clear" class="favorito-card" (click)="alternarFavoritoCard($event, pokemon)"
-            [attr.aria-label]="pokemon.favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'">
 
-            <ion-icon slot="icon-only" [name]="pokemon.favorito ? 'heart' : 'heart-outline'">
+          <ion-button fill="clear" class="favorito-card" (click)="alternarFavoritoCard($event, pokemon)"
+            [attr.aria-label]="
+                  pokemon.favorito
+                    ? 'Remover dos favoritos'
+                    : 'Adicionar aos favoritos'
+                ">
+
+            <ion-icon slot="icon-only" [name]="pokemon.favorito
+                    ? 'heart'
+                    : 'heart-outline'">
             </ion-icon>
 
           </ion-button>
+
           <span class="pokemon-id">
             #{{ pokemon.id }}
           </span>
@@ -57,9 +130,11 @@
           </ion-img>
 
           <ion-card-header>
+
             <ion-card-title>
               {{ pokemon.name }}
             </ion-card-title>
+
           </ion-card-header>
 
         </ion-card>
@@ -69,13 +144,23 @@
       }
 
     </ion-row>
+
   </ion-grid>
+
   }
 
-  @if (!termoBusca && !carregando && !erroCarregamento) {
-  <ion-button class="carregar-mais" expand="block" (click)="carregarMaisPokemons()" [disabled]="carregandoMais">
-    {{ carregandoMais ? 'Carregando...' : 'Carregar mais' }}
+  @if (
+  !termoBusca &&
+  !carregando &&
+  !erroCarregamento &&
+  filtroSelecionado === 'todos'
+  ) {
+
+  <ion-button class="carregar-mais" fill="clear" (click)="carregarMaisPokemons()" [disabled]="carregandoMais">
+    <span class="conteudo-botao">
+      <span class="pokebola" aria-hidden="true"></span>
+      <span>{{ carregandoMais ? 'Carregando...' : 'Carregar mais' }}</span>
+    </span>
   </ion-button>
   }
-
 </ion-content>

@@ -8,25 +8,27 @@ import {
   IonContent,
   IonGrid,
   IonHeader,
+  IonIcon,
   IonImg,
   IonItem,
   IonLabel,
   IonList,
   IonRow,
   IonSearchbar,
-  IonTitle,
-  IonToolbar,
-  IonIcon
+  IonSegment,
+  IonSegmentButton,
+  IonToolbar
 } from '@ionic/angular/standalone';
 
-import { Router } from '@angular/router';
-import { PokemonService } from '../core/services/pokemon.service';
-import { PokemonListItem } from '../features/pokemon/models/pokemon-list-response.model';
 import { NgClass } from '@angular/common';
+import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { heart, heartOutline } from 'ionicons/icons';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { PokemonService } from '../core/services/pokemon.service';
+import { PokemonListItem } from '../features/pokemon/models/pokemon-list-response.model';
+import { chevronForwardOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-home',
@@ -35,7 +37,6 @@ import { catchError, map, switchMap } from 'rxjs/operators';
   imports: [
     IonHeader,
     IonToolbar,
-    IonTitle,
     IonContent,
     IonCard,
     IonCardHeader,
@@ -50,7 +51,9 @@ import { catchError, map, switchMap } from 'rxjs/operators';
     IonItem,
     IonLabel,
     NgClass,
-    IonIcon
+    IonIcon,
+    IonSegment,
+    IonSegmentButton
   ],
 })
 export class HomePage implements OnInit {
@@ -73,12 +76,15 @@ export class HomePage implements OnInit {
 
   termoBusca = '';
 
+  filtroSelecionado = 'todos';
+
   private readonly router = inject(Router);
 
   constructor() {
     addIcons({
       heart,
-      heartOutline
+      heartOutline,
+      chevronForwardOutline
     });
   }
 
@@ -164,29 +170,51 @@ export class HomePage implements OnInit {
 
     if (!valor) {
       this.sugestoes = [];
-      this.pokemonsFiltrados = this.pokemons;
+
+      this.pokemonsFiltrados =
+        this.filtroSelecionado === 'favoritos'
+          ? this.pokemons.filter(pokemon => pokemon.favorito)
+          : this.pokemons;
+
       return;
     }
 
-    this.sugestoes = this.todosPokemons
+    const listaBusca =
+      this.filtroSelecionado === 'favoritos'
+        ? this.todosPokemons.filter(pokemon =>
+          this.pokemonService.pokemonFavorito(
+            this.extrairIdPokemon(pokemon.url)
+          )
+        )
+        : this.todosPokemons;
+
+    this.sugestoes = listaBusca
       .filter(pokemon =>
         pokemon.name.toLowerCase().startsWith(valor)
       )
       .slice(0, 8);
 
-    this.buscaSemResultado = this.sugestoes.length === 0;
+    if (this.sugestoes.length === 0) {
+      this.buscaSemResultado = true;
+      this.pokemonsFiltrados = [];
+    }
   }
 
   selecionarPokemon(pokemon: PokemonListItem): void {
-
     this.prepararPokemonCompleto(pokemon)
       .subscribe(pokemonCompleto => {
 
-        this.pokemonsFiltrados = [
-          pokemonCompleto
-        ];
+        if (this.filtroSelecionado === 'favoritos' && !pokemonCompleto.favorito) {
+          this.pokemonsFiltrados = [];
+          this.buscaSemResultado = true;
+          this.sugestoes = [];
+          return;
+        }
+
+        this.pokemonsFiltrados = [pokemonCompleto];
 
         this.sugestoes = [];
+        this.buscaSemResultado = false;
       });
   }
 
@@ -226,10 +254,7 @@ export class HomePage implements OnInit {
       : 'tipo-default';
   }
 
-  alternarFavoritoCard(
-    event: Event,
-    pokemon: PokemonListItem
-  ): void {
+  alternarFavoritoCard(event: Event, pokemon: PokemonListItem): void {
     event.stopPropagation();
 
     if (!pokemon.id) {
@@ -243,6 +268,10 @@ export class HomePage implements OnInit {
     }
 
     pokemon.favorito = !pokemon.favorito;
+
+    if (this.filtroSelecionado === 'favoritos') {
+      this.carregarFavoritos();
+    }
   }
 
   private prepararPokemonCompleto(pokemon: PokemonListItem): Observable<PokemonListItem> {
@@ -262,5 +291,59 @@ export class HomePage implements OnInit {
         })),
         catchError(() => of(pokemonPreparado))
       );
+  }
+
+  alterarFiltro(valor: string | number | undefined): void {
+    const filtro = String(valor ?? 'todos');
+
+    this.filtroSelecionado = filtro;
+    this.termoBusca = '';
+    this.sugestoes = [];
+
+    if (filtro === 'favoritos') {
+      this.carregarFavoritos();
+      return;
+    }
+
+    this.pokemonsFiltrados = this.pokemons;
+  }
+
+  carregarFavoritos(): void {
+    const idsFavoritos = this.pokemonService.listarFavoritos();
+
+    if (idsFavoritos.length === 0) {
+      this.pokemonsFiltrados = [];
+      return;
+    }
+
+    this.carregando = true;
+
+    forkJoin(
+      idsFavoritos.map(id =>
+        this.pokemonService.buscarPokemonPorId(id).pipe(
+          map(detalhe => ({
+            name: detalhe.name,
+            url: '',
+            id: detalhe.id,
+            imageUrl: this.pokemonService.obterImagemPokemon(id),
+            types: detalhe.types.map(tipo => tipo.type.name),
+            favorito: true
+          }))
+        )
+      )
+    ).subscribe({
+      next: favoritos => {
+        this.pokemonsFiltrados = favoritos;
+        this.carregando = false;
+        this.erroCarregamento = false;
+      },
+
+      error: error => {
+        console.error('Erro ao carregar favoritos', error);
+
+        this.carregando = false;
+        this.erroCarregamento = true;
+      }
+    });
   }
 }

@@ -1,10 +1,21 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
-    </ion-buttons>
+  <ion-toolbar class="app-toolbar">
 
-    <ion-title>Detalhes</ion-title>
+    <div class="toolbar-grid">
+
+      <ion-buttons>
+        <ion-back-button defaultHref="/home" text="">
+        </ion-back-button>
+      </ion-buttons>
+
+      <span class="toolbar-title">
+        Detalhes
+      </span>
+
+      <div class="toolbar-space"></div>
+
+    </div>
+
   </ion-toolbar>
 </ion-header>
 
@@ -51,7 +62,7 @@
 
   <div class="pokemon-detalhes">
 
-    <ion-segment [value]="abaSelecionada" (ionChange)="alterarAba($event)">
+    <ion-segment mode="ios" class="app-segment" [value]="abaSelecionada" (ionChange)="alterarAba($event)">
 
       <ion-segment-button value="sobre">
         <ion-label>Sobre</ion-label>

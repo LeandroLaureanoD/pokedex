@@ -8,7 +8,6 @@ import {
   IonLabel,
   IonSegment,
   IonSegmentButton,
-  IonTitle,
   IonToolbar
 } from '@ionic/angular/standalone';
 
@@ -24,7 +23,6 @@ import { PokemonDetail } from '../../models/pokemon-detail.model';
     IonToolbar,
     IonButtons,
     IonBackButton,
-    IonTitle,
     IonContent,
     IonSegment,
     IonSegmentButton,
