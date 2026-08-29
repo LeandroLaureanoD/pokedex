@@ -13,7 +13,10 @@ import {
   IonRow,
   IonCol,
   IonSearchbar,
-  IonButton
+  IonButton,
+  IonList,
+  IonItem,
+  IonLabel
 } from '@ionic/angular/standalone';
 
 import { PokemonService } from '../core/services/pokemon.service';
@@ -38,7 +41,10 @@ import { Router } from '@angular/router';
     IonRow,
     IonCol,
     IonSearchbar,
-    IonButton
+    IonButton,
+    IonList,
+    IonItem,
+    IonLabel
   ],
 })
 export class HomePage implements OnInit {
@@ -47,16 +53,21 @@ export class HomePage implements OnInit {
 
   pokemons: PokemonListItem[] = [];
   pokemonsFiltrados: PokemonListItem[] = [];
+  todosPokemons: PokemonListItem[] = [];
+  sugestoes: PokemonListItem[] = [];
 
   limit = 20;
   offset = 0;
 
   carregandoMais = false;
+  buscaSemResultado = false;
+  buscandoPokemon = false;
 
   private readonly router = inject(Router);
 
   ngOnInit(): void {
     this.listarPokemons();
+    this.carregarPokemonsParaBusca();
   }
 
   listarPokemons(carregarMais: boolean = false): void {
@@ -106,13 +117,41 @@ export class HomePage implements OnInit {
     const valor = event.detail.value?.toLowerCase().trim() ?? '';
 
     if (!valor) {
+      this.sugestoes = [];
       this.pokemonsFiltrados = this.pokemons;
       return;
     }
 
-    this.pokemonsFiltrados = this.pokemons.filter(pokemon =>
-      pokemon.name.toLowerCase().includes(valor)
-    );
+    this.sugestoes = this.todosPokemons
+      .filter(pokemon =>
+        pokemon.name.toLowerCase().startsWith(valor)
+      )
+      .slice(0, 8);
+  }
+
+  selecionarPokemon(pokemon: PokemonListItem): void {
+    const id = this.extrairIdPokemon(pokemon.url);
+
+    this.pokemonsFiltrados = [
+      {
+        ...pokemon,
+        id,
+        imageUrl: this.pokemonService.obterImagemPokemon(id)
+      }
+    ];
+
+    this.sugestoes = [];
+  }
+
+  carregarPokemonsParaBusca(): void {
+    this.pokemonService.listarPokemonsParaBusca().subscribe({
+      next: response => {
+        this.todosPokemons = response.results;
+      },
+      error: error => {
+        console.error('Erro ao carregar Pokémon para busca', error);
+      }
+    });
   }
 
   abrirDetalhes(id?: number): void {

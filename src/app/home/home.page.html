@@ -7,6 +7,30 @@
 <ion-searchbar placeholder="Buscar Pokémon" (ionInput)="buscarPokemon($event)">
 </ion-searchbar>
 
+@if (sugestoes.length > 0) {
+
+<ion-list>
+  @for (pokemon of sugestoes; track pokemon.name) {
+
+  <ion-item button (click)="selecionarPokemon(pokemon)">
+
+    <ion-label>
+      {{ pokemon.name }}
+    </ion-label>
+
+  </ion-item>
+
+  }
+</ion-list>
+
+}
+@if (buscandoPokemon) {
+<p>Buscando Pokémon...</p>
+}
+
+@if (buscaSemResultado) {
+<p>Nenhum Pokémon encontrado.</p>
+}
 <ion-content class="ion-padding">
   <ion-grid>
     <ion-row>

@@ -23,13 +23,29 @@ export class PokemonService {
     );
   }
 
+  listarPokemonsParaBusca(): Observable<PokemonListResponse> {
+    return this.http.get<PokemonListResponse>(
+      `${this.apiUrl}/pokemon?limit=2000&offset=0`
+    );
+  }
+
   obterImagemPokemon(id: number): string {
     return `${this.imageUrl}/${id}.png`;
+  }
+
+  obterUrlPokemon(id: number): string {
+    return `${this.apiUrl}/pokemon/${id}/`;
   }
 
   buscarPokemonPorId(id: number): Observable<PokemonDetail> {
     return this.http.get<PokemonDetail>(
       `${this.apiUrl}/pokemon/${id}`
+    );
+  }
+
+  buscarPokemonPorNome(nome: string): Observable<PokemonDetail> {
+    return this.http.get<PokemonDetail>(
+      `${this.apiUrl}/pokemon/${nome.toLowerCase()}`
     );
   }
 
