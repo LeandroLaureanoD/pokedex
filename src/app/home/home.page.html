@@ -12,7 +12,7 @@
     <ion-row>
       @for (pokemon of pokemonsFiltrados; track pokemon.name) {
       <ion-col size="6" size-md="4" size-lg="3">
-        <ion-card>
+        <ion-card (click)="abrirDetalhes(pokemon.id)">
           <ion-img [src]="pokemon.imageUrl" [alt]="pokemon.name">
           </ion-img>
           <ion-card-header>

@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PokemonListResponse } from '../../features/pokemon/models/pokemon-list-response.model';
+import { PokemonDetailPage } from '../../features/pokemon/pages/pokemon-detail/pokemon-detail.page';
+import { PokemonDetail } from '../../features/pokemon/models/pokemon-detail.model';
 
 @Injectable({
   providedIn: 'root'
@@ -22,5 +24,11 @@ export class PokemonService {
 
   obterImagemPokemon(id: number): string {
     return `${this.imageUrl}/${id}.png`;
+  }
+
+  buscarPokemonPorId(id: number): Observable<PokemonDetail> {
+    return this.http.get<PokemonDetail>(
+      `${this.apiUrl}/pokemon/${id}`
+    );
   }
 }

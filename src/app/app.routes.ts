@@ -5,9 +5,15 @@ export const routes: Routes = [
     path: 'home',
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
+   {
+    path: 'pokemon/:id',
+    loadComponent: () =>
+      import('./features/pokemon/pages/pokemon-detail/pokemon-detail.page').then((m) => m.PokemonDetailPage),
+  },
   {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full',
   },
 ];
+

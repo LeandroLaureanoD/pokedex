@@ -17,6 +17,7 @@ import {
 
 import { PokemonService } from '../core/services/pokemon.service';
 import { PokemonListItem } from '../features/pokemon/models/pokemon-list-response.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -44,6 +45,8 @@ export class HomePage implements OnInit {
 
   pokemons: PokemonListItem[] = [];
   pokemonsFiltrados: PokemonListItem[] = [];
+
+  private readonly router = inject(Router);
 
   ngOnInit(): void {
     this.listarPokemons();
@@ -75,13 +78,6 @@ export class HomePage implements OnInit {
     return Number(partes[partes.length - 1]);
   }
 
-  obterImagemPokemon(id?: number): string {
-    if (!id) {
-      return '';
-    }
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
-  }
-
   buscarPokemon(event: CustomEvent): void {
     const valor = event.detail.value?.toLowerCase().trim() ?? '';
 
@@ -93,5 +89,12 @@ export class HomePage implements OnInit {
     this.pokemonsFiltrados = this.pokemons.filter(pokemon =>
       pokemon.name.toLowerCase().includes(valor)
     );
+  }
+
+  abrirDetalhes(id?: number): void {
+    if (!id) {
+      return;
+    }
+    this.router.navigate(['/pokemon', id]);
   }
 }
