@@ -1,20 +1,36 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-title>Pokédex</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <ion-grid>
+    <ion-row>
+
+      @for (pokemon of pokemons; track pokemon.name) {
+
+      <ion-col size="6" size-md="4" size-lg="3">
+
+        <ion-card>
+
+          <ion-img [src]="obterImagemPokemon(pokemon.id)" [alt]="pokemon.name">
+          </ion-img>
+
+          <ion-card-header>
+            <ion-card-title>
+              {{ pokemon.name }}
+            </ion-card-title>
+          </ion-card-header>
+
+        </ion-card>
+
+      </ion-col>
+
+      }
+
+    </ion-row>
+  </ion-grid>
+
 </ion-content>
