@@ -103,6 +103,7 @@
           "options": {
             "tsConfig": "tsconfig.spec.json",
             "buildTarget": "::development",
+            "runner": "vitest",
             "setupFiles": [
               "src/test-setup.ts"
             ]
