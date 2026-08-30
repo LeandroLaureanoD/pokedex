@@ -4,14 +4,6 @@ Aplicação desenvolvida em Ionic com Angular para consumo da PokéAPI, permitin
 
 O projeto foi desenvolvido como parte de um desafio técnico, com foco em organização de código, componentização, responsividade e boas práticas de desenvolvimento.
 
-## Demo
-
-Em breve:
-
-- Aplicação publicada
-- Screenshots
-- GIF ou vídeo de demonstração
-
 ## Funcionalidades
 
 - Listagem de Pokémon com nome e imagem
@@ -21,6 +13,7 @@ Em breve:
 - Informações de tipo, altura, peso, status e habilidades
 - Favoritos persistidos no `localStorage`
 - Filtro para visualização de favoritos
+- Envio de evento via webhook ao favoritar um Pokémon
 - Interface responsiva
 - Compatibilidade com diferentes orientações mobile
 - Cores dinâmicas de acordo com o tipo principal do Pokémon
@@ -42,6 +35,7 @@ Também foram utilizados:
 - Ionicons
 - PokéAPI
 - Official Artwork da PokéAPI
+- Vercel Functions
 
 ## Organização do projeto
 
@@ -79,6 +73,33 @@ GET /pokemon
 GET /pokemon/{id}
 ```
 
+## Webhook
+
+A aplicação possui uma integração via webhook disparada ao favoritar um Pokémon.
+
+O evento é enviado através de uma requisição `POST` para uma Vercel Function disponível no endpoint:
+
+```text
+/api/webhook
+```
+
+Exemplo de payload:
+
+```json
+{
+  "event": "pokemon_favorited",
+  "pokemon": {
+    "id": 4,
+    "name": "charmander"
+  },
+  "createdAt": "2026-08-30T02:22:26.185Z"
+}
+```
+
+A função serverless recebe o evento e retorna uma confirmação da requisição.
+
+Essa implementação foi utilizada para demonstrar uma integração orientada a eventos sem a necessidade de manter um servidor backend dedicado.
+
 ## Como executar
 
 Clone o repositório:
@@ -107,6 +128,12 @@ ionic serve
 
 A aplicação ficará disponível no endereço informado pelo Ionic no terminal.
 
+Para executar a aplicação localmente junto com a Vercel Function utilizada pelo webhook:
+
+```bash
+vercel dev
+```
+
 ## Testes
 
 Os testes unitários utilizam Vitest.
@@ -119,7 +146,8 @@ Atualmente, a suíte cobre:
 - prevenção de favoritos duplicados;
 - navegação da tela principal para os detalhes;
 - formatação de ID, altura, peso e status;
-- criação dos principais componentes da aplicação.
+- criação dos principais componentes da aplicação;
+- envio do webhook ao favoritar um Pokémon.
 
 Para executar os testes em modo de observação:
 
@@ -136,8 +164,8 @@ ng test --configuration ci
 Resultado atual:
 
 ```text
-Test Files  4 passed
-Tests       16 passed
+Test Files  5 passed
+Tests       18 passed
 ```
 
 ## Responsividade
@@ -150,6 +178,18 @@ Foram realizados testes em:
 - modo landscape;
 - visualização Android;
 - visualização iOS.
+
+## Apresentação
+
+### Tela principal e detalhes
+
+<p align="center">
+  <img src="docs/home.png" width="250" alt="Tela principal da Pokédex">
+  <img src="docs/detail-sobre.png" width="250" alt="Detalhes do Pokémon - Sobre">
+  <img src="docs/detail-status.png" width="250" alt="Detalhes do Pokémon - Status">
+  <img src="docs/detail-habilidades.png" width="250" alt="Detalhes do Pokémon - Habilidades">
+  <img src="docs/favorites.png" width="250" alt="Lista de Pokémon favoritos">
+</p>
 
 ## Melhorias futuras
 
