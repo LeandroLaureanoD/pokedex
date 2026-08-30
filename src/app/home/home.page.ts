@@ -17,13 +17,18 @@ import {
   IonSearchbar,
   IonSegment,
   IonSegmentButton,
-  IonToolbar
+  IonToolbar,
+  IonFooter
 } from '@ionic/angular/standalone';
 
 import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { heart, heartOutline } from 'ionicons/icons';
+import {
+  gridOutline,
+  heart,
+  heartOutline
+} from 'ionicons/icons';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { PokemonService } from '../core/services/pokemon.service';
@@ -54,7 +59,8 @@ import { WebhookService } from '../core/services/webhook.service';
     NgClass,
     IonIcon,
     IonSegment,
-    IonSegmentButton
+    IonSegmentButton,
+    IonFooter
   ],
 })
 export class HomePage implements OnInit {
@@ -71,22 +77,24 @@ export class HomePage implements OnInit {
 
   carregandoMais = false;
   buscaSemResultado = false;
-
-  carregando = true;
+  mostrarCarregarMais = false;
   erroCarregamento = false;
+  carregando = true;
 
   termoBusca = '';
 
   filtroSelecionado = 'todos';
+
 
   private readonly webhookService = inject(WebhookService);
   private readonly router = inject(Router);
 
   constructor() {
     addIcons({
+      chevronForwardOutline,
+      gridOutline,
       heart,
-      heartOutline,
-      chevronForwardOutline
+      heartOutline
     });
   }
 
@@ -243,6 +251,7 @@ export class HomePage implements OnInit {
       return;
     }
 
+    this.mostrarCarregarMais = false;
     this.carregandoMais = true;
 
     this.listarPokemons(true);
@@ -352,5 +361,20 @@ export class HomePage implements OnInit {
         this.erroCarregamento = true;
       }
     });
+  }
+
+  async verificarPosicaoScroll(event: CustomEvent): Promise<void> {
+    const content = event.target as HTMLIonContentElement;
+    const scrollElement = await content.getScrollElement();
+
+    const distanciaDoFim =
+      scrollElement.scrollHeight -
+      scrollElement.scrollTop -
+      scrollElement.clientHeight;
+
+    this.mostrarCarregarMais =
+      distanciaDoFim <= 200 &&
+      this.filtroSelecionado === 'todos' &&
+      !this.termoBusca;
   }
 }
