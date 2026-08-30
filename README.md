@@ -4,6 +4,12 @@ Aplicação desenvolvida em Ionic com Angular para consumo da PokéAPI, permitin
 
 O projeto foi desenvolvido como parte de um desafio técnico, com foco em organização de código, componentização, responsividade e boas práticas de desenvolvimento.
 
+## Demo
+
+🚀 Aplicação publicada na Vercel:
+
+[Acessar Pokédex](https://pokedex-tays.vercel.app/home)
+
 ## Funcionalidades
 
 - Listagem de Pokémon com nome e imagem
@@ -185,10 +191,10 @@ Foram realizados testes em:
 
 <p align="center">
   <img src="docs/home.png" width="250" alt="Tela principal da Pokédex">
+  <img src="docs/favorites.png" width="250" alt="Lista de Pokémon favoritos">
   <img src="docs/detail-sobre.png" width="250" alt="Detalhes do Pokémon - Sobre">
   <img src="docs/detail-status.png" width="250" alt="Detalhes do Pokémon - Status">
   <img src="docs/detail-habilidades.png" width="250" alt="Detalhes do Pokémon - Habilidades">
-  <img src="docs/favorites.png" width="250" alt="Lista de Pokémon favoritos">
 </p>
 
 ## Melhorias futuras
