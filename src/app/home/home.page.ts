@@ -29,6 +29,7 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { PokemonService } from '../core/services/pokemon.service';
 import { PokemonListItem } from '../features/pokemon/models/pokemon-list-response.model';
 import { chevronForwardOutline } from 'ionicons/icons';
+import { WebhookService } from '../core/services/webhook.service';
 
 @Component({
   selector: 'app-home',
@@ -78,6 +79,7 @@ export class HomePage implements OnInit {
 
   filtroSelecionado = 'todos';
 
+  private readonly webhookService = inject(WebhookService);
   private readonly router = inject(Router);
 
   constructor() {
@@ -265,6 +267,11 @@ export class HomePage implements OnInit {
       this.pokemonService.removerFavorito(pokemon.id);
     } else {
       this.pokemonService.favoritarPokemon(pokemon.id);
+
+      this.webhookService.enviarPokemonFavoritado(
+        pokemon.id,
+        pokemon.name
+      );
     }
 
     pokemon.favorito = !pokemon.favorito;
