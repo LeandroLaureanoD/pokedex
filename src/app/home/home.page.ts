@@ -6,6 +6,7 @@ import {
   IonCardTitle,
   IonCol,
   IonContent,
+  IonFooter,
   IonGrid,
   IonHeader,
   IonIcon,
@@ -15,16 +16,14 @@ import {
   IonList,
   IonRow,
   IonSearchbar,
-  IonSegment,
-  IonSegmentButton,
-  IonToolbar,
-  IonFooter
+  IonToolbar
 } from '@ionic/angular/standalone';
 
 import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import {
+  chevronForwardOutline,
   gridOutline,
   heart,
   heartOutline
@@ -32,9 +31,8 @@ import {
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { PokemonService } from '../core/services/pokemon.service';
-import { PokemonListItem } from '../features/pokemon/models/pokemon-list-response.model';
-import { chevronForwardOutline } from 'ionicons/icons';
 import { WebhookService } from '../core/services/webhook.service';
+import { PokemonListItem } from '../features/pokemon/models/pokemon-list-response.model';
 
 @Component({
   selector: 'app-home',
@@ -58,8 +56,6 @@ import { WebhookService } from '../core/services/webhook.service';
     IonLabel,
     NgClass,
     IonIcon,
-    IonSegment,
-    IonSegmentButton,
     IonFooter
   ],
 })
