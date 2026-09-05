@@ -441,68 +441,27 @@ ion-toolbar {
 
 /* Infinite Scroll */
 
-ion-infinite-scroll,
+ion-infinite-scroll {
+  height: 36px;
+  min-height: 36px;
+  background: #fff !important;
+}
+
 ion-infinite-scroll-content {
-  background: transparent !important;
+  min-height: 36px !important;
+  height: 36px !important;
+  background: #fff !important;
 }
 
 .infinite-loading {
+  height: 36px;
   display: flex;
-  justify-content: center;
   align-items: center;
-
-  min-height: 60px;
-  padding: 10px 0;
+  justify-content: center;
+  background: #fff !important;
 }
 
-.pokebola-loading {
-  width: 22px;
-  height: 22px;
-
-  border: 2px solid #ef4444;
-  border-radius: 50%;
-
-  position: relative;
-
-  animation: girar-pokebola 0.8s linear infinite;
-}
-
-.pokebola-loading::before {
-  content: '';
-
-  position: absolute;
-  left: 0;
-  top: 8px;
-
-  width: 100%;
-  height: 2px;
-
-  background: #ef4444;
-}
-
-.pokebola-loading::after {
-  content: '';
-
-  position: absolute;
-  left: 50%;
-  top: 50%;
-
-  width: 5px;
-  height: 5px;
-
-  background: white;
-  border: 2px solid #ef4444;
-  border-radius: 50%;
-
-  transform: translate(-50%, -50%);
-}
-
-@keyframes girar-pokebola {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+.infinite-loading ion-spinner {
+  width: 18px;
+  height: 18px;
 }

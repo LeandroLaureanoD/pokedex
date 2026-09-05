@@ -20,7 +20,8 @@ import {
   IonList,
   IonRow,
   IonSearchbar,
-  IonToolbar
+  IonToolbar,
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -60,7 +61,8 @@ import { PokemonListItem } from '../features/pokemon/models/pokemon-list-respons
     IonIcon,
     IonFooter,
     IonInfiniteScroll,
-    IonInfiniteScrollContent
+    IonInfiniteScrollContent,
+    IonSpinner
   ],
 })
 export class HomePage implements OnInit {

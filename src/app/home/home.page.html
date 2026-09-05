@@ -11,10 +11,7 @@
 
   <ion-toolbar class="home-controls-toolbar">
     <div class="home-controls">
-      <ion-searchbar
-        class="pokemon-search"
-        placeholder="Buscar Pokémon"
-        (ionInput)="buscarPokemon($event)">
+      <ion-searchbar class="pokemon-search" placeholder="Buscar Pokémon" (ionInput)="buscarPokemon($event)">
       </ion-searchbar>
     </div>
   </ion-toolbar>
@@ -24,88 +21,72 @@
   <div class="home-container">
 
     @if (sugestoes.length > 0) {
-      <ion-list class="lista-sugestoes">
-        @for (pokemon of sugestoes; track pokemon.name) {
-          <ion-item
-            class="sugestao-item"
-            button
-            detail="false"
-            lines="none"
-            (click)="selecionarPokemon(pokemon)">
+    <ion-list class="lista-sugestoes">
+      @for (pokemon of sugestoes; track pokemon.name) {
+      <ion-item class="sugestao-item" button detail="false" lines="none" (click)="selecionarPokemon(pokemon)">
 
-            <ion-label>{{ pokemon.name }}</ion-label>
-            <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
-          </ion-item>
-        }
-      </ion-list>
+        <ion-label>{{ pokemon.name }}</ion-label>
+        <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
+      </ion-item>
+      }
+    </ion-list>
     }
 
     @if (carregando) {
-      <p class="mensagem">Carregando Pokémon...</p>
+    <p class="mensagem">Carregando Pokémon...</p>
     }
 
     @if (erroCarregamento) {
-      <p class="mensagem erro">Não foi possível carregar os Pokémon.</p>
+    <p class="mensagem erro">Não foi possível carregar os Pokémon.</p>
     }
 
     @if (!carregando && !erroCarregamento && pokemonsFiltrados.length === 0) {
-      <div class="mensagem-vazia">
-        <div class="mensagem-vazia-icone">🔎</div>
-        <p>Nenhum Pokémon encontrado.</p>
-      </div>
+    <div class="mensagem-vazia">
+      <div class="mensagem-vazia-icone">🔎</div>
+      <p>Nenhum Pokémon encontrado.</p>
+    </div>
     }
 
     @if (!carregando && !erroCarregamento && pokemonsFiltrados.length > 0) {
-      <ion-grid>
-        <ion-row>
-          @for (pokemon of pokemonsFiltrados; track pokemon.name) {
-            <ion-col size="6" size-md="4" size-lg="3">
-              <ion-card
-                class="pokemon-card"
-                [ngClass]="obterClasseTipo(pokemon)"
-                (click)="abrirDetalhes(pokemon.id)">
+    <ion-grid>
+      <ion-row>
+        @for (pokemon of pokemonsFiltrados; track pokemon.name) {
+        <ion-col size="6" size-md="4" size-lg="3">
+          <ion-card class="pokemon-card" [ngClass]="obterClasseTipo(pokemon)" (click)="abrirDetalhes(pokemon.id)">
 
-                <ion-button
-                  fill="clear"
-                  class="favorito-card"
-                  (click)="alternarFavoritoCard($event, pokemon)"
-                  [attr.aria-label]="pokemon.favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'">
+            <ion-button fill="clear" class="favorito-card" (click)="alternarFavoritoCard($event, pokemon)"
+              [attr.aria-label]="pokemon.favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'">
 
-                  <ion-icon
-                    slot="icon-only"
-                    [name]="pokemon.favorito ? 'heart' : 'heart-outline'">
-                  </ion-icon>
-                </ion-button>
+              <ion-icon slot="icon-only" [name]="pokemon.favorito ? 'heart' : 'heart-outline'">
+              </ion-icon>
+            </ion-button>
 
-                <span class="pokemon-id">#{{ pokemon.id }}</span>
+            <span class="pokemon-id">#{{ pokemon.id }}</span>
 
-                <ion-img
-                  [src]="pokemon.imageUrl"
-                  [alt]="pokemon.name">
-                </ion-img>
+            <ion-img [src]="pokemon.imageUrl" [alt]="pokemon.name">
+            </ion-img>
 
-                <ion-card-header>
-                  <ion-card-title>{{ pokemon.name }}</ion-card-title>
-                </ion-card-header>
-              </ion-card>
-            </ion-col>
-          }
-        </ion-row>
-      </ion-grid>
+            <ion-card-header>
+              <ion-card-title>{{ pokemon.name }}</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
     }
   </div>
 
   @if (!termoBusca && !carregando && !erroCarregamento && filtroSelecionado === 'todos') {
-    <ion-infinite-scroll
-      threshold="100px"
-      (ionInfinite)="carregarMaisPokemons($event)">
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="carregarMaisPokemons($event)">
 
-      <ion-infinite-scroll-content loadingSpinner="null" loadingText="">
-        <div class="infinite-loading">
-          <span class="pokebola-loading"></span>
-        </div>
-      </ion-infinite-scroll-content>
-    </ion-infinite-scroll>
+    <ion-infinite-scroll-content loadingSpinner="null" loadingText="">
+      <div class="infinite-loading">
+        <ion-spinner name="crescent"></ion-spinner>
+      </div>
+    </ion-infinite-scroll-content>
+
+  </ion-infinite-scroll>
   }
 </ion-content>
 
@@ -113,10 +94,7 @@
   <ion-toolbar>
     <div class="menu-inferior">
 
-      <ion-button
-        fill="clear"
-        class="menu-item"
-        [class.ativo]="filtroSelecionado === 'todos'"
+      <ion-button fill="clear" class="menu-item" [class.ativo]="filtroSelecionado === 'todos'"
         (click)="alterarFiltro('todos')">
 
         <div>
@@ -125,10 +103,7 @@
         </div>
       </ion-button>
 
-      <ion-button
-        fill="clear"
-        class="menu-item"
-        [class.ativo]="filtroSelecionado === 'favoritos'"
+      <ion-button fill="clear" class="menu-item" [class.ativo]="filtroSelecionado === 'favoritos'"
         (click)="alterarFiltro('favoritos')">
 
         <div>
