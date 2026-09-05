@@ -1,4 +1,6 @@
+import { NgClass } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   IonButton,
   IonCard,
@@ -11,6 +13,8 @@ import {
   IonHeader,
   IonIcon,
   IonImg,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
   IonItem,
   IonLabel,
   IonList,
@@ -18,9 +22,6 @@ import {
   IonSearchbar,
   IonToolbar
 } from '@ionic/angular/standalone';
-
-import { NgClass } from '@angular/common';
-import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import {
   chevronForwardOutline,
@@ -30,6 +31,7 @@ import {
 } from 'ionicons/icons';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+
 import { PokemonService } from '../core/services/pokemon.service';
 import { WebhookService } from '../core/services/webhook.service';
 import { PokemonListItem } from '../features/pokemon/models/pokemon-list-response.model';
@@ -56,12 +58,16 @@ import { PokemonListItem } from '../features/pokemon/models/pokemon-list-respons
     IonLabel,
     NgClass,
     IonIcon,
-    IonFooter
+    IonFooter,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent
   ],
 })
 export class HomePage implements OnInit {
 
   private readonly pokemonService = inject(PokemonService);
+  private readonly webhookService = inject(WebhookService);
+  private readonly router = inject(Router);
 
   pokemons: PokemonListItem[] = [];
   pokemonsFiltrados: PokemonListItem[] = [];
@@ -71,19 +77,12 @@ export class HomePage implements OnInit {
   limit = 20;
   offset = 0;
 
-  carregandoMais = false;
-  buscaSemResultado = false;
-  mostrarCarregarMais = false;
-  erroCarregamento = false;
   carregando = true;
+  carregandoMais = false;
+  erroCarregamento = false;
 
   termoBusca = '';
-
   filtroSelecionado = 'todos';
-
-
-  private readonly webhookService = inject(WebhookService);
-  private readonly router = inject(Router);
 
   constructor() {
     addIcons({
@@ -99,15 +98,10 @@ export class HomePage implements OnInit {
     this.carregarPokemonsParaBusca();
   }
 
-  listarPokemons(carregarMais: boolean = false): void {
+  listarPokemons(carregarMais = false, infiniteScrollEvent?: any): void {
+    if (!carregarMais) this.carregando = true;
 
-    if (!carregarMais) {
-      this.carregando = true;
-    }
-
-    const offsetConsulta = carregarMais
-      ? this.offset + this.limit
-      : 0;
+    const offsetConsulta = carregarMais ? this.offset + this.limit : 0;
 
     this.pokemonService
       .listarPokemons(this.limit, offsetConsulta)
@@ -122,13 +116,8 @@ export class HomePage implements OnInit {
       )
       .subscribe({
         next: novosPokemons => {
-
           if (carregarMais) {
-            this.pokemons = [
-              ...this.pokemons,
-              ...novosPokemons
-            ];
-
+            this.pokemons = [...this.pokemons, ...novosPokemons];
             this.offset = offsetConsulta;
           } else {
             this.pokemons = novosPokemons;
@@ -136,10 +125,11 @@ export class HomePage implements OnInit {
           }
 
           this.pokemonsFiltrados = this.pokemons;
-
           this.carregando = false;
           this.carregandoMais = false;
           this.erroCarregamento = false;
+
+          infiniteScrollEvent?.target.complete();
         },
 
         error: error => {
@@ -148,131 +138,95 @@ export class HomePage implements OnInit {
           this.carregando = false;
           this.carregandoMais = false;
           this.erroCarregamento = true;
+
+          infiniteScrollEvent?.target.complete();
         }
       });
-  }
-
-  private prepararPokemon(pokemon: PokemonListItem): PokemonListItem {
-    const id = this.extrairIdPokemon(pokemon.url);
-
-    return {
-      ...pokemon,
-      id,
-      imageUrl: this.pokemonService.obterImagemPokemon(id),
-      favorito: this.pokemonService.pokemonFavorito(id)
-    };
-  }
-
-  private extrairIdPokemon(url: string): number {
-    const partes = url.split('/').filter(Boolean);
-    return Number(partes[partes.length - 1]);
   }
 
   buscarPokemon(event: CustomEvent): void {
     const valor = event.detail.value?.toLowerCase().trim() ?? '';
 
     this.termoBusca = valor;
-    this.buscaSemResultado = false;
 
     if (!valor) {
       this.sugestoes = [];
-
-      this.pokemonsFiltrados =
-        this.filtroSelecionado === 'favoritos'
-          ? this.pokemons.filter(pokemon => pokemon.favorito)
-          : this.pokemons;
+      this.pokemonsFiltrados = this.filtroSelecionado === 'favoritos'
+        ? this.pokemons.filter(pokemon => pokemon.favorito)
+        : this.pokemons;
 
       return;
     }
 
-    const listaBusca =
-      this.filtroSelecionado === 'favoritos'
-        ? this.todosPokemons.filter(pokemon =>
+    const listaBusca = this.filtroSelecionado === 'favoritos'
+      ? this.todosPokemons.filter(pokemon =>
           this.pokemonService.pokemonFavorito(
             this.extrairIdPokemon(pokemon.url)
           )
         )
-        : this.todosPokemons;
+      : this.todosPokemons;
 
     this.sugestoes = listaBusca
-      .filter(pokemon =>
-        pokemon.name.toLowerCase().startsWith(valor)
-      )
+      .filter(pokemon => pokemon.name.toLowerCase().startsWith(valor))
       .slice(0, 8);
 
     if (this.sugestoes.length === 0) {
-      this.buscaSemResultado = true;
       this.pokemonsFiltrados = [];
     }
   }
 
   selecionarPokemon(pokemon: PokemonListItem): void {
-    this.prepararPokemonCompleto(pokemon)
-      .subscribe(pokemonCompleto => {
-
-        if (this.filtroSelecionado === 'favoritos' && !pokemonCompleto.favorito) {
-          this.pokemonsFiltrados = [];
-          this.buscaSemResultado = true;
-          this.sugestoes = [];
-          return;
-        }
-
-        this.pokemonsFiltrados = [pokemonCompleto];
-
+    this.prepararPokemonCompleto(pokemon).subscribe(pokemonCompleto => {
+      if (
+        this.filtroSelecionado === 'favoritos' &&
+        !pokemonCompleto.favorito
+      ) {
+        this.pokemonsFiltrados = [];
         this.sugestoes = [];
-        this.buscaSemResultado = false;
-      });
+        return;
+      }
+
+      this.pokemonsFiltrados = [pokemonCompleto];
+      this.sugestoes = [];
+    });
   }
 
   carregarPokemonsParaBusca(): void {
     this.pokemonService.listarPokemonsParaBusca().subscribe({
-      next: response => {
-        this.todosPokemons = response.results;
-      },
-      error: error => {
-        console.error('Erro ao carregar Pokémon para busca', error);
-      }
+      next: response => this.todosPokemons = response.results,
+      error: error =>
+        console.error('Erro ao carregar Pokémon para busca', error)
     });
   }
 
-  abrirDetalhes(id?: number): void {
-    if (!id) {
+  carregarMaisPokemons(event: any): void {
+    if (this.carregandoMais) {
+      event.target.complete();
       return;
     }
-    this.router.navigate(['/pokemon', id]);
+
+    this.carregandoMais = true;
+    this.listarPokemons(true, event);
   }
 
-  carregarMaisPokemons(): void {
-    if (this.carregandoMais) {
-      return;
-    }
-
-    this.mostrarCarregarMais = false;
-    this.carregandoMais = true;
-
-    this.listarPokemons(true);
+  abrirDetalhes(id?: number): void {
+    if (id) this.router.navigate(['/pokemon', id]);
   }
 
   obterClasseTipo(pokemon: PokemonListItem): string {
     const tipoPrincipal = pokemon.types?.[0];
-
-    return tipoPrincipal
-      ? `tipo-${tipoPrincipal}`
-      : 'tipo-default';
+    return tipoPrincipal ? `tipo-${tipoPrincipal}` : 'tipo-default';
   }
 
   alternarFavoritoCard(event: Event, pokemon: PokemonListItem): void {
     event.stopPropagation();
 
-    if (!pokemon.id) {
-      return;
-    }
+    if (!pokemon.id) return;
 
     if (pokemon.favorito) {
       this.pokemonService.removerFavorito(pokemon.id);
     } else {
       this.pokemonService.favoritarPokemon(pokemon.id);
-
       this.webhookService.enviarPokemonFavoritado(
         pokemon.id,
         pokemon.name
@@ -284,25 +238,6 @@ export class HomePage implements OnInit {
     if (this.filtroSelecionado === 'favoritos') {
       this.carregarFavoritos();
     }
-  }
-
-  private prepararPokemonCompleto(pokemon: PokemonListItem): Observable<PokemonListItem> {
-
-    const pokemonPreparado = this.prepararPokemon(pokemon);
-
-    if (!pokemonPreparado.id) {
-      return of(pokemonPreparado);
-    }
-
-    return this.pokemonService
-      .buscarPokemonPorId(pokemonPreparado.id)
-      .pipe(
-        map(detalhe => ({
-          ...pokemonPreparado,
-          types: detalhe.types.map(tipo => tipo.type.name)
-        })),
-        catchError(() => of(pokemonPreparado))
-      );
   }
 
   alterarFiltro(valor: string | number | undefined): void {
@@ -352,25 +287,38 @@ export class HomePage implements OnInit {
 
       error: error => {
         console.error('Erro ao carregar favoritos', error);
-
         this.carregando = false;
         this.erroCarregamento = true;
       }
     });
   }
 
-  async verificarPosicaoScroll(event: CustomEvent): Promise<void> {
-    const content = event.target as HTMLIonContentElement;
-    const scrollElement = await content.getScrollElement();
+  private prepararPokemonCompleto(
+    pokemon: PokemonListItem
+  ): Observable<PokemonListItem> {
 
-    const distanciaDoFim =
-      scrollElement.scrollHeight -
-      scrollElement.scrollTop -
-      scrollElement.clientHeight;
+    const id = this.extrairIdPokemon(pokemon.url);
 
-    this.mostrarCarregarMais =
-      distanciaDoFim <= 200 &&
-      this.filtroSelecionado === 'todos' &&
-      !this.termoBusca;
+    const pokemonPreparado: PokemonListItem = {
+      ...pokemon,
+      id,
+      imageUrl: this.pokemonService.obterImagemPokemon(id),
+      favorito: this.pokemonService.pokemonFavorito(id)
+    };
+
+    if (!id) return of(pokemonPreparado);
+
+    return this.pokemonService.buscarPokemonPorId(id).pipe(
+      map(detalhe => ({
+        ...pokemonPreparado,
+        types: detalhe.types.map(tipo => tipo.type.name)
+      })),
+      catchError(() => of(pokemonPreparado))
+    );
+  }
+
+  private extrairIdPokemon(url: string): number {
+    const partes = url.split('/').filter(Boolean);
+    return Number(partes[partes.length - 1]);
   }
 }
